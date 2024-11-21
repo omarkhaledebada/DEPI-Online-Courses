@@ -1,0 +1,240 @@
+﻿ @model IEnumerable<Online_Courses_2024.Models.Lesson>
+@{
+    var firstLesson = Model.FirstOrDefault().Content; 
+}
+<style>
+    /* start top videos */
+.videos {
+    padding-top: 60px;
+    padding-bottom: 60px;
+    position: relative;
+}
+
+.videos .container .holder {
+    display: flex;
+    border: 1px solid #ccc;
+    padding: 0;
+}
+.main-title{
+  font-family: 'Roboto', sans-serif; 
+  font-size: 28px; 
+  font-weight: 700; 
+  color: #333; 
+  letter-spacing: 2px;
+  text-transform: uppercase; 
+  padding-bottom:4px;
+}
+
+
+.videos .container .playlist {
+    min-width: 300px;
+}
+
+.videos .container .playlist .name {
+    font-size: 15px;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    padding: 15px;
+    background-color: #f4f4f4;
+}
+
+.videos .container .playlist ul {}
+
+.videos .container .playlist ul li {
+    padding: 20px;
+    border-top: 1px solid #ede4e4;
+    cursor: pointer;
+    transition: 0.3s;
+    -webkit-transition: 0.3s;
+    -moz-transition: 0.3s;
+    -ms-transition: 0.3s;
+    -o-transition: 0.3s;
+}
+
+.videos .container .playlist ul li:hover {
+    color: #2193f3;
+    background-color: #fafafa;
+}
+
+.videos .container .playlist ul li span {
+    display: block;
+    margin-top: 10px;
+    color: #777;
+}
+
+.videos .container .preview {
+    background-color: #e2e2e2;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 10px;
+}
+
+ .videos .container .preview video {
+    max-width: 100%;
+}
+
+.videos .container .preview .caption {
+    background: white;
+    padding: 20px;
+    font-size: 15px;
+    margin-top: 10px;
+}
+
+    .progress {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        box-shadow: 0 0 20px rgba(0, 255, 0, 0.7);
+    }
+
+        .progress span {
+            position: absolute;
+            font-size: 20px;
+            font-weight: bold;
+            color: #000;
+            z-index: 1;
+        }
+
+        .progress::after {
+            content: '';
+            width: 85%;
+            height: 85%;
+            background: #fff;
+            border-radius: 50%;
+            position: absolute;
+        }
+
+
+
+/* end top videos */
+</style>
+ <!-- start top videos -->
+<!-- start top videos -->
+<div class="videos" id="video">
+    <div class="container">
+        <div class="d-flex justify-content-between px-4">
+            <h2 class="main-title ">TOP VIDEOS</h2>
+            <div class="progress mb-3" id="progressCircle" style="background: conic-gradient(#4caf50 0%, #4caf50 @ViewBag.Progress%, #ccc @ViewBag.Progress%, #ccc 100%);">
+                <span id="progressText">@ViewBag.Progress</span>
+            </div>
+        </div>
+        <div class="holder">
+            <div class="playlist">
+                <div class="name">
+                    Top Videos
+                    <i class="fas fa-random"></i>
+                </div>
+                <ul>
+                    @foreach (var item in Model)
+                    {
+                        <li class="vTitle" data-lesson-id="@item.LessonId">
+                            <div class="lessonTitle"> @item.LessonTitle</div>
+                            <input type="hidden" value="@item.Content" />
+                        </li>
+                    }
+                </ul>
+            </div>
+            <div class="preview">
+                <video controls="controls" id="Video" src="@("/assets/Courses/CSS/" + firstLesson)">
+                </video>
+                <div class="caption d-flex justify-content-between">
+                    <div id="assignmentSection">
+                        <!-- Assignments will be displayed here -->
+                    </div>
+                  
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end top videos -->
+<!-- end top videos -->
+<script>
+listTitle = document.querySelectorAll(".vTitle");
+for (var i = 0; i < listTitle.length; i++) {
+    listTitle[i].addEventListener("click", function (eventInfo) {
+        let lessonId2 = this.getAttribute("data-lesson-id");
+        console.log(lessonId2 + " yaaaaaaarb");
+
+        // First, update the progress, then fetch it immediately to reflect the update in the UI
+        $.ajax({
+            url: '@Url.Action("UpdateProgress", "Course")',
+            type: 'POST',
+            data: { id: lessonId2 },
+            success: function () {
+                // After successfully updating the progress, fetch the updated progress
+                console.log("Progress updated successfully.");
+
+                $.ajax({
+                    url: '@Url.Action("getProgress", "Course")',
+                    type: 'GET',
+                    data: { id: @ViewBag.Courseid },
+                    success: function (response) {
+                        // Update the progress circle after fetching the updated progress
+                        console.log(response + "hello bolbol");
+                        $("#progressCircle").css("background", `conic-gradient(#4caf50 0%, #4caf50 ${response}%, #ccc ${response}%, #ccc 100%)`);
+                        $("#progressText").text(`${response}`);
+                    },
+                    error: function (xhr, status, error) {
+                        console.log(error);
+                    }
+                });
+            },
+            error: function (xhr, status, error) {
+                console.log(error);
+            }
+        });
+
+        // Handle the video source and UI changes
+        listTitle.forEach(function (el) {
+            el.style.backgroundColor = "";
+        });
+
+        let url = this.querySelector("input").value;
+        this.style.backgroundColor = "#5fcf80bd";
+        document.getElementById("Video").setAttribute('src', `/assets/Courses/CSS/${url}`);
+
+        let lessonId = this.getAttribute("data-lesson-id");
+
+        // Assuming assignments are passed via ViewBag
+        let assignments =@Html.Raw(Json.Serialize(ViewBag.Assignment)).$values;
+
+        // Filter assignments based on the clicked lesson
+        let filteredAssignments = assignments.filter(a => a.lessonId == lessonId);
+
+        let assignmentSection = document.getElementById("assignmentSection");
+        assignmentSection.innerHTML = ""; // Clear previous assignments
+
+        filteredAssignments.forEach(function (assignment) {
+            assignmentSection.innerHTML += `<div class="assignment-item">
+                                                <strong>${assignment.assignmentTitle}</strong>
+                                                <p>
+                                                    <a href="#" class="assignment-link"
+                                                        data-url="/assets/Courses/assignments/${assignment.description}">
+                                                        Click here to view the assignment
+                                                    </a>
+                                                </p>
+                                            </div>`;
+        });
+
+        // Add click listeners to assignment links
+        document.querySelectorAll('.assignment-link').forEach(function (link) {
+            link.addEventListener('click', function (e) {
+                e.preventDefault(); // Prevent default behavior
+                let url = this.getAttribute('data-url');
+                window.open(url, '_blank'); // Open in a new tab
+            });
+        });
+    });
+}
+
+   
+</script>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>

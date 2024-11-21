@@ -1,0 +1,36 @@
+﻿@model IEnumerable<Online_Courses_2024.Models.Assignment>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1 class="text-center">Assignments</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Create New Assignment</a>
+</p>
+
+<table class="table table-striped table-bordered">
+    <thead class="thead-dark">
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.AssignmentTitle)</th>
+            <th>@Html.DisplayNameFor(model => model.Description)</th>
+            <th>@Html.DisplayNameFor(model => model.Lesson)</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.AssignmentTitle)</td>
+                <td>@Html.DisplayFor(modelItem => item.Description)</td>
+                <td>@Html.DisplayFor(modelItem => item.Lesson.LessonTitle)</td>
+                <td>
+                    <a asp-action="Update" asp-route-id="@item.AssignmentId" class="btn btn-sm btn-warning">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@item.AssignmentId" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

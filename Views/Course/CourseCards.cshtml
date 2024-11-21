@@ -1,0 +1,75 @@
+﻿@model IEnumerable<Online_Courses_2024.ViewModel.CourseModelView>
+
+@{
+    ViewData["Title"] = "Courses";
+}
+
+<div class="container">
+    <div class="row">
+        @foreach (var item in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 position-relative">
+                    <!-- Add Ribbon -->
+                    <div class="ribbon">
+                        <span>@item.CourseName</span>
+                    </div>
+
+                    <!-- Image and Content -->
+                    <img src="https://mscm.co.uk/wp-content/uploads/2022/03/online-courses.jpg" class="card-img-top" alt="Course Image">
+                    <div class="card-body">
+                        <p class="card-text">
+                            <strong>Description: </strong>@item.Description <br />
+                            <strong>Price: </strong>@item.Price.ToString("C") <br />
+                            <strong>Duration: </strong>@item.DurationAttribute hour <br />
+                            <strong>Instructor: </strong>@item.Instructor.Name
+                        </p>
+                    </div>
+                    <div class="card-footer d-flex justify-content-between">
+                        <a asp-action="Submit" asp-controller="Enroll" asp-route-id="@item.CourseId" class="btn btn-success Enroll">
+                            <i class="fas fa-check-circle"></i> Enroll
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Ribbon CSS -->
+<style>
+    .ribbon {
+        position: absolute;
+        top: -10px;
+        right: -10px;
+        overflow: hidden;
+        width: 120px;
+        height: 120px;
+    }
+
+        .ribbon span {
+            position: absolute;
+            display: block;
+            width: 150px;
+            padding: 10px 0;
+            background-color: #5fcf80;
+            color: black;
+            font-size: 18px;
+            text-align: center;
+            font-weight: bold;
+            transform: rotate(45deg);
+            top: 20px;
+            right: -30px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+        }
+
+    .card {
+        position: relative;
+    }
+</style>
+
+
+
+@section Scripts {
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+}
